@@ -65,7 +65,7 @@ functions.
 
 let plus = uncurry (+) ;;
      
-let times = curry ( * ) ;;
+let times = uncurry ( * ) ;;
   
 (*......................................................................
 Exercise 3: Recall the prods function from Lab 1:
@@ -222,10 +222,10 @@ generate an alternate solution without this property?
 Do so below in a new definition of zip.
 ......................................................................*)
 
-let rec zip (x : 'a list) (y : 'b list) : Some (('a * 'b) list) =
+let rec zip (x : 'a list) (y : 'b list) : (('a * 'b) list) option =
   match x, y with
   | [], [] ->  Some []
-  | xhd :: xtl, yhd :: ytl -> (match (zip_exn xtl ytl) with
+  | xhd :: xtl, yhd :: ytl -> (match (zip xtl ytl) with
                               | Some a -> Some ((xhd, yhd) :: a)
                               | None -> None)
   | _ -> None ;;
