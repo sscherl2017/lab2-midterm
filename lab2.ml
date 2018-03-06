@@ -63,9 +63,9 @@ Using your uncurry function, define uncurried plus and times
 functions.
 ......................................................................*)
 
-let plus = (+) ;;
+let plus = uncurry (+) ;;
      
-let times = ( * ) ;;
+let times = curry ( * ) ;;
   
 (*......................................................................
 Exercise 3: Recall the prods function from Lab 1:
@@ -79,7 +79,7 @@ Now reimplement prods using map and your uncurried times function. Why
 do you need the uncurried times function?
 ......................................................................*)
 
-let prods = List.map (fun x y -> x * y) ;; 
+let prods = List.map times ;; 
 
 (*======================================================================
 Part 2: Option types
@@ -187,8 +187,8 @@ AND of two bool options, or None if both are None. If exactly one is
 None, return the other.
 ......................................................................*)
   
-let and_option =
-  fun _ -> failwith "and_option not implemented" ;;
+let and_option x y =
+  calc_option (&&) x y;;
   
 (*......................................................................
 Exercise 10: In Lab 1, you implemented a function zip that takes two
@@ -207,8 +207,11 @@ type of the result? Did you provide full typing information in the
 first line of the definition?
 ......................................................................*)
 
-let zip_exn =
-  fun _ -> failwith "zip_exn not implemented" ;;
+let rec zip_exn (x : 'a list) (y : 'b list) : ('a * 'b) list =
+  match x, y with
+  | [], [] -> []
+  | xhd :: xtl, yhd :: ytl -> (xhd, yhd) :: (zip_exn xtl ytl)
+  | _ -> [] ;;
 
 (*......................................................................
 Exercise 11: Another problem with the implementation of zip_exn is that,
@@ -219,8 +222,13 @@ generate an alternate solution without this property?
 Do so below in a new definition of zip.
 ......................................................................*)
 
-let zip =
-  fun _ -> failwith "zip not implemented" ;;
+let rec zip (x : 'a list) (y : 'b list) : Some (('a * 'b) list) =
+  match x, y with
+  | [], [] ->  Some []
+  | xhd :: xtl, yhd :: ytl -> (match (zip_exn xtl ytl) with
+                              | Some a -> Some ((xhd, yhd) :: a)
+                              | None -> None)
+  | _ -> None ;;
 
 (*====================================================================
 Part 4: Factoring out None-handling
@@ -253,7 +261,9 @@ adjusted for the result type. Implement the maybe function.
 ......................................................................*)
   
 let maybe (f : 'a -> 'b) (x : 'a option) : 'b option =
-  failwith "maybe not implemented" ;; 
+  match x with
+  | None -> None
+  | Some v -> Some (f v) ;; 
 
 (*......................................................................
 Exercise 13: Now reimplement dotprod to use the maybe function. (The
