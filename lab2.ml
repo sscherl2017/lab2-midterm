@@ -277,14 +277,14 @@ let sum : int list -> int =
   List.fold_left (+) 0 ;;
 
 let dotprod (a : int list) (b : int list) : int option =
-  failwith "dot_prod not implemented" ;; 
+  maybe (fun pairs -> sum (prods pairs)) (zip a b) ;; 
 
 (*......................................................................
 Exercise 14: Reimplement zip along the same lines, in zip_2 below. 
 ......................................................................*)
 
 let rec zip_2 (x : int list) (y : int list) : ((int * int) list) option =
-  failwith "zip_2 not implemented" ;;
+  failwith "max_list not implemented" ;; 
 
 (*......................................................................
 Exercise 15: For the energetic, reimplement max_list along the same
@@ -341,7 +341,7 @@ For example:
 let transcript (enrollments : enrollment list)
                (student : int)
              : enrollment list =
-  failwith "transcript not implemented" ;;
+  List.filter (fun {id: _} -> id = student) enrollments ;;
   
 (*......................................................................
 Exercise 17: Define a function called ids that takes an enrollment
@@ -355,7 +355,7 @@ For example:
 ......................................................................*)
 
 let ids (enrollments: enrollment list) : int list =
-  failwith "ids not implemented" ;;
+  List.sort_uniq (-) (List.map (fun student -> student.id) enrollments) ;;
   
 (*......................................................................
 Exercise 18: Define a function called verify that determines whether all
@@ -368,4 +368,4 @@ For example:
 ......................................................................*)
 
 let verify (enrollments : enrollment list) : bool =
-  failwith "verify not implemented" ;;
+   1 < (List.length (List.sort_uniq (-) (List.map (fun student -> student.id) enrollments))) ;;
