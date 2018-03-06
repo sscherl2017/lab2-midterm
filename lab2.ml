@@ -44,9 +44,11 @@ To think about before you start coding:
 Now implement the two functions curry and uncurry.
 ......................................................................*)
 
-let curry = fun _ -> failwith "curry not implemented" ;;
+let uncurry (input : 'a -> 'b -> 'c) : 'a * 'b -> 'c =
+  fun (x, y) -> input x y ;;
      
-let uncurry = fun _ -> failwith "uncurry not implemented" ;;
+let curry (input : 'a * 'b -> 'c) : 'a -> 'b -> 'c = 
+  fun x y -> input (x,y) ;;
 
 (*......................................................................
 Exercise 2: OCaml's built in binary operators, like ( + ) and ( * ) are
@@ -61,11 +63,9 @@ Using your uncurry function, define uncurried plus and times
 functions.
 ......................................................................*)
 
-let plus =
-  fun _ -> failwith "plus not implemented"
+let plus = (+) ;;
      
-let times =
-  fun _ -> failwith "times not implemented" ;;
+let times = ( * ) ;;
   
 (*......................................................................
 Exercise 3: Recall the prods function from Lab 1:
@@ -79,8 +79,7 @@ Now reimplement prods using map and your uncurried times function. Why
 do you need the uncurried times function?
 ......................................................................*)
 
-let prods =
-  fun _ -> failwith "prods not implemented" ;; 
+let prods = List.map (fun x y -> x * y) ;; 
 
 (*======================================================================
 Part 2: Option types
@@ -113,8 +112,12 @@ Reimplement max_list, but this time, it should return an int option
 instead of an int.
 ......................................................................*)
 
-let max_list (lst : int list) : int option =
-  failwith "max_list not implemented" ;;
+let rec max_list (lst : int list) : int option =
+  match lst with
+  | [] -> None
+  | head :: tail -> match max_list tail with
+                    | None -> Some head
+                    | Some max_tail-> Some (max head max_tail) ;;
   
 (*......................................................................
 Exercise 5: Write a function to return the smaller of two int options,
@@ -124,7 +127,10 @@ useful.
 ......................................................................*)
 
 let min_option (x : int option) (y : int option) : int option =
-  failwith "min_option not implemented" ;;
+  match x,y with
+  | None, None -> None
+  | Some a, None | None, Some a -> Some a
+  | Some a, Some b -> Some (min a b) ;;
      
 (*......................................................................
 Exercise 6: Write a function to return the larger of two int options, or
@@ -133,7 +139,10 @@ other.
 ......................................................................*)
 
 let max_option (x : int option) (y : int option) : int option =
-  failwith "max_option not implemented" ;;
+  match x,y with
+  | None, None -> None
+  | Some a, None | None, Some a -> Some a
+  | Some a, Some b -> Some (max a b) ;;
 
 (*======================================================================
 Part 3: Polymorphism practice
@@ -153,8 +162,11 @@ result appropriately returned.
 What is calc_option's function signature? Implement calc_option.
 ......................................................................*)
 
-let calc_option =
-  fun _ -> failwith "calc_option not implemented" ;;
+let calc_option f x y =
+  match x,y with
+  | None, None -> None
+  | Some a, None | None, Some a -> Some a
+  | Some a, Some b -> Some (f a b) ;;
      
 (*......................................................................
 Exercise 8: Now rewrite min_option and max_option using the higher-order
@@ -162,10 +174,10 @@ function calc_option. Call them min_option_2 and max_option_2.
 ......................................................................*)
   
 let min_option_2 =
-  fun _ -> failwith "min_option_2 not implemented" ;;
+  calc_option min ;;
      
 let max_option_2 =
-  fun _ -> failwith "max_option_2 not implemented" ;;
+  calc_option max ;;
 
 (*......................................................................
 Exercise 9: Now that we have calc_option, we can use it in other
